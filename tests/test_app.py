@@ -1,6 +1,12 @@
 # tests/test_app.py
 import json
-from app.app import app, feature_names
+import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))  # noqa: E402
+
+from app.app import app, feature_names  # noqa: E402
 
 
 def test_root():
