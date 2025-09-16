@@ -138,14 +138,24 @@ flake8 .
 
 ## 🔄 CI/CD Pipeline
 
-### GitHub Actions
-- **Lint Workflow**: Runs on push to `dev` branch
-- **Test Workflow**: Runs on pull requests to `test` branch
+### Complete MLOps Workflow
+1. **Development**: Work on `dev` branch
+2. **Code Quality**: Push to `dev` → triggers flake8 linting
+3. **Testing**: PR from `dev` to `test` → triggers unit tests
+4. **Production**: PR from `test` to `main` → triggers Docker deployment
+5. **Deployment**: GitHub Actions builds and pushes to Docker Hub
+6. **Notification**: Email notification sent to admin
 
-### Jenkins Pipeline
-- **Build**: Creates Docker image
-- **Push**: Pushes to Docker Hub
-- **Notify**: Sends email notifications
+### GitHub Actions Workflows
+- **Lint Workflow**: Code quality check with flake8 on `dev` branch
+- **Test Workflow**: Unit testing on `test` branch
+- **Deploy Workflow**: Docker build and push to Docker Hub on `main` branch
+- **Notify Workflow**: Email notifications on successful deployment
+
+### Branch Protection
+- **Admin Approval**: Required for all merges to `main` and `test`
+- **Status Checks**: All workflows must pass before merging
+- **Pull Requests**: Required for all changes
 
 ## 📊 Model Performance
 

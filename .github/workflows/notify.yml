@@ -1,0 +1,41 @@
+name: Email Notification
+on:
+  workflow_run:
+    workflows: ["Deploy to Production (Docker Hub)"]
+    types: [completed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Send success notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ MLOps Pipeline Success - Heart Disease API Deployed"
+          to: ${{ secrets.ADMIN_EMAIL }}
+          from: ${{ secrets.EMAIL_USERNAME }}
+          body: |
+            🎉 MLOps Pipeline Execution Successful!
+            
+            📊 Project: Heart Disease Prediction API
+            🚀 Deployment: Production
+            📦 Docker Image: ${{ secrets.DOCKERHUB_USERNAME }}/heart-disease-api:latest
+            🔗 Repository: ${{ github.repository }}
+            👤 Triggered by: ${{ github.actor }}
+            ⏰ Timestamp: ${{ github.event.workflow_run.created_at }}
+            
+            ✅ All checks passed:
+            - Code quality (Flake8) ✅
+            - Unit tests ✅
+            - Docker build ✅
+            - Docker Hub push ✅
+            
+            🐳 Docker image is now available on Docker Hub!
+            
+            Best regards,
+            MLOps Pipeline Bot
