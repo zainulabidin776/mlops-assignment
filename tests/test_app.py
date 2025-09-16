@@ -2,11 +2,15 @@
 import json
 from app.app import app, feature_names
 
+
 def test_root():
     client = app.test_client()
     res = client.get("/")
     assert res.status_code == 200
-    assert b"Heart Disease Prediction API" in res.data or b"running" in res.data
+    expected_text = b"Heart Disease Prediction API" in res.data
+    running_text = b"running" in res.data
+    assert expected_text or running_text
+
 
 def test_predict():
     client = app.test_client()

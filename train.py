@@ -1,5 +1,7 @@
 # train.py
-import argparse, os, json
+import argparse
+import os
+import json
 import pandas as pd
 import joblib
 from sklearn.model_selection import train_test_split
@@ -8,6 +10,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report, accuracy_score
+
 
 def main(args):
     df = pd.read_csv(args.data)
@@ -43,7 +46,7 @@ def main(args):
 
     os.makedirs("model", exist_ok=True)
     joblib.dump(pipeline, "model/model.pkl")
-    with open("model/metadata.json","w") as f:
+    with open("model/metadata.json", "w") as f:
         json.dump({
             "feature_names": list(X.columns),
             "categorical": cat_cols,
@@ -52,6 +55,7 @@ def main(args):
         }, f, indent=2)
 
     print("Saved model and metadata.")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
