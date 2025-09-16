@@ -111,7 +111,7 @@ def test_linting():
     # Install flake8 if not available
     run_command('pip install flake8', 'Installing flake8', check=False)
     
-    result = run_command('flake8 .', 'Running flake8 linting')
+    result = run_command('flake8 app/ tests/ train.py test_request.py --exclude=venv', 'Running flake8 linting')
     if result and result.returncode == 0:
         print("✅ Linting passed!")
         return True
