@@ -8,12 +8,13 @@ pipeline {
     }
     
     stages {
-        stage('Checkout') {
-             steps {
-        git branch: 'main',
-            url: 'https://github.com/zainulabidin776/mlops-assignment.git'
+       stage('Checkout') {
+    steps {
+        checkout scm
+        echo "✅ Code checked out successfully"
     }
-        }
+}
+
         
         stage('Install Dependencies') {
             steps {
