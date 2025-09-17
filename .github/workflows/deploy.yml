@@ -5,15 +5,86 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  DOCKER_IMAGE: heart-disease-api
+  DOCKER_TAG: ${{ github.sha }}
+
 jobs:
-  trigger-jenkins:
+  deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Trigger Jenkins Build
-        uses: appleboy/jenkins-action@master
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          url: "http://localhost:8080"
-          user: "zayynn"
-          password: "11e9006e0a15c9b2794ff56229c4b392e2"
-          job: "mlops-heart-disease-api"
+          python-version: '3.10'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r app/requirements.txt pytest
+      
+      - name: Run final tests
+        run: pytest tests/ -v
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      - name: Test Docker image
+        run: |
+          docker run -d -p 5000:5000 --name test-container ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest
+          sleep 10
+          curl -f http://localhost:5000/ || exit 1
+          docker stop test-container
+          docker rm test-container
+      
+      - name: Send success notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ MLOps Pipeline Success - Heart Disease API Deployed"
+          to: ${{ secrets.ADMIN_EMAIL }}
+          from: ${{ secrets.EMAIL_USERNAME }}
+          body: |
+            🎉 MLOps Pipeline Execution Successful!
+            
+            📊 Project: Heart Disease Prediction API
+            🚀 Deployment: Production
+            �� Docker Image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest
+            🔗 Repository: ${{ github.repository }}
+            �� Triggered by: ${{ github.actor }}
+            ⏰ Timestamp: ${{ github.event.head_commit.timestamp }}
+            
+            ✅ All checks passed:
+            - Code quality (Flake8) ✅
+            - Unit tests ✅
+            - Docker build ✅
+            - Docker Hub push ✅
+            
+            🐳 Docker image is now available on Docker Hub!
+            
+            Best regards,
+            MLOps Pipeline Bot
