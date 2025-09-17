@@ -99,7 +99,7 @@ pipeline {
                 Best regards,
                 MLOps Pipeline Bot
                 """,
-                to: "${EMAIL}"
+                to: "${env.EMAIL}"
             )
             echo "✅ Success notification sent"
         }
@@ -120,7 +120,7 @@ pipeline {
                 Best regards,
                 MLOps Pipeline Bot
                 """,
-                to: "${EMAIL}"
+                to: "${env.EMAIL}"
             )
             echo "❌ Failure notification sent"
         }
