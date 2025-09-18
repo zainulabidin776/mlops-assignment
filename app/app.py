@@ -9,10 +9,22 @@ app = Flask(__name__)
 MODEL_PATH = os.path.join("model", "model.pkl")
 META_PATH = os.path.join("model", "metadata.json")
 
-model = joblib.load(MODEL_PATH)
-with open(META_PATH, "r") as f:
-    metadata = json.load(f)
-feature_names = metadata["feature_names"]
+# Add debugging
+print(f"Current working directory: {os.getcwd()}")
+print(f"Model path: {MODEL_PATH}")
+print(f"Metadata path: {META_PATH}")
+print(f"Model file exists: {os.path.exists(MODEL_PATH)}")
+print(f"Metadata file exists: {os.path.exists(META_PATH)}")
+
+try:
+    model = joblib.load(MODEL_PATH)
+    with open(META_PATH, "r") as f:
+        metadata = json.load(f)
+    feature_names = metadata["feature_names"]
+    print(f"Model loaded successfully. Features: {len(feature_names)}")
+except Exception as e:
+    print(f"Error loading model: {e}")
+    raise
 
 
 @app.route("/")
