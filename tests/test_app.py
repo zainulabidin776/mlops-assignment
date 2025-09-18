@@ -27,7 +27,7 @@ class TestHeartDiseaseAPI:
         """Test prediction endpoint with valid data"""
         # Create sample data with all required features
         sample_data = {name: 1 for name in feature_names}
-        # Set categorical fields to valid values
+        # Set categorical fields to valid valuess
         sample_data["Sex"] = "M"
         sample_data["ChestPainType"] = "ATA"
         sample_data["RestingECG"] = "Normal"
