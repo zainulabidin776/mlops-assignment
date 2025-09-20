@@ -142,19 +142,19 @@ class APITester:
         """Test prediction endpoint with valid data"""
         try:
             print(f"{Colors.CYAN}🔮 Testing prediction endpoint with valid data...{Colors.NC}")
-            # Valid test data (using correct feature names from metadata.json)
+            # Valid test data (using correct data types from dataset)
             test_data = {
                 "Age": 65,
-                "Sex": 1,
-                "ChestPainType": 3,
+                "Sex": "M",
+                "ChestPainType": "ATA",
                 "RestingBP": 145,
                 "Cholesterol": 233,
-                "FastingBS": 1,
-                "RestingECG": 0,
+                "FastingBS": 0,
+                "RestingECG": "Normal",
                 "MaxHR": 150,
-                "ExerciseAngina": 0,
+                "ExerciseAngina": "N",
                 "Oldpeak": 2.3,
-                "ST_Slope": 0
+                "ST_Slope": "Up"
             }
             
             response = requests.post(
@@ -192,10 +192,10 @@ class APITester:
         """Test prediction endpoint with missing features"""
         try:
             print(f"{Colors.CYAN}❌ Testing prediction endpoint with missing features...{Colors.NC}")
-            # Incomplete test data (using correct feature names)
+            # Incomplete test data (using correct data types)
             test_data = {
                 "Age": 65,
-                "Sex": 1
+                "Sex": "M"
                 # Missing other required features
             }
             
