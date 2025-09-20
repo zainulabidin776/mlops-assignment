@@ -91,13 +91,13 @@ pipeline {
                         # Clean up any existing test containers
                         docker rm -f test-container || true
                         
-                        # Run the container with host port mapping
+                        # Run the container
                         docker run -d -p 5001:5000 --name test-container ${DOCKER_IMAGE}:latest
                         
                         echo "⏳ Waiting for API to become ready..."
                         for i in {1..20}; do
                             if curl -s http://localhost:5001/ > /dev/null; then
-                                echo "✅ API is up"
+                                echo "✅ API is up!"
                                 break
                             fi
                             echo "⏳ Still waiting... attempt \$i"
@@ -108,8 +108,8 @@ pipeline {
                         curl -f http://localhost:5001/ || exit 1
                         
                         echo "🔍 Running prediction test..."
-                        curl -s -X POST http://localhost:5001/predict \
-                            -H "Content-Type: application/json" \
+                        curl -s -X POST http://localhost:5001/predict \\
+                            -H "Content-Type: application/json" \\
                             -d '{
                                 "age": 50,
                                 "sex": 1,
