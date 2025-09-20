@@ -1,4 +1,4 @@
-py#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 🧪 Flask API Test Script for MLOps Assignment
 Group Members: Zain Ul Abidin (22I-2738) & Ahmed Javed (21I-1108)
@@ -127,17 +127,17 @@ class APITester:
         try:
             # Valid test data
             test_data = {
-                "age": 65,
-                "sex": 1,
-                "cp": 3,
-                "trestbps": 145,
-                "chol": 233,
-                "fbs": 1,
-                "restecg": 0,
-                "thalach": 150,
-                "exang": 0,
-                "oldpeak": 2.3,
-                "slope": 0
+                "Age": 65,
+                "Sex": 1,
+                "ChestPainType": 3,
+                "RestingBP": 145,
+                "Cholesterol": 233,
+                "FastingBS": 1,
+                "RestingECG": 0,
+                "MaxHR": 150,
+                "ExerciseAngina": 0,
+                "Oldpeak": 2.3,
+                "ST_Slope": 0
             }
             
             response = requests.post(
@@ -176,8 +176,8 @@ class APITester:
         try:
             # Incomplete test data
             test_data = {
-                "age": 65,
-                "sex": 1
+                "Age": 65,
+                "Sex": 1
                 # Missing other required features
             }
             
