@@ -110,7 +110,7 @@ pipeline {
                         echo "🔍 Testing API endpoint..."
                         for i in \$(seq 1 5); do
                             echo "Attempt \$i..."
-                            if curl -f http://localhost:5000/; then
+                            if curl -f http://localhost:5001/; then
                                 echo "✅ API test successful!"
                                 break
                             else

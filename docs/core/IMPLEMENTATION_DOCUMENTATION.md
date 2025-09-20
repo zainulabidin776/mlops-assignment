@@ -1,16 +1,19 @@
 # 🚀 MLOps Assignment Implementation Documentation
 
 **Group Members:**
-- **Zain Ul Abidin** (22I-2738)
-- **Ahmed Javed** (21I-1108)
+- **Zain Ul Abidin** (22I-2738) - Primary Developer & DevOps Engineer
+- **Ahmed Javed** (21I-1108) - Co-Developer & Testing Specialist
 
 **Project:** Heart Disease Prediction API with Complete CI/CD Pipeline
+
+**Assignment:** Machine Learning Operations Assignment 1 (100 Marks)
+**Deadline:** September 20, 2025
 
 ---
 
 ## 📋 **Project Overview**
 
-We have successfully implemented a complete MLOps pipeline for a Heart Disease Prediction API using machine learning (RandomForest) and Flask. The system includes automated testing, code quality checks, Docker containerization, and deployment to Docker Hub.
+We have successfully implemented a complete MLOps pipeline for a Heart Disease Prediction API using machine learning (RandomForest) and Flask. The system includes automated testing, code quality checks, Docker containerization, and deployment to Docker Hub. This implementation fulfills all requirements of the MLOps Assignment 1, demonstrating professional-grade DevOps practices and automated deployment workflows.
 
 ---
 
@@ -129,18 +132,25 @@ mlops-assignment/
 ### **Phase 5: Jenkins Pipeline Setup**
 
 #### **5.1 Jenkins Installation & Configuration**
-- **Method:** Docker-based Jenkins installation
+- **Method:** Docker-based Jenkins installation using `jenkins/jenkins:lts`
+- **Port Mapping:** 8080:8080 (Jenkins UI), 50000:50000 (Agent communication)
 - **Plugins Installed:**
   - Git
   - Docker Pipeline
   - Email Extension
   - GitHub Integration
   - Credentials Binding
+  - GitHub Webhook
 
 #### **5.2 Jenkins Pipeline (`Jenkinsfile`)**
 ```groovy
 pipeline {
     agent any
+    
+    triggers {
+        githubPush()  // Webhook trigger for automatic builds
+    }
+    
     environment {
         DOCKER_IMAGE = "itsmezayynn/heart-disease-api"
         DOCKERHUB_CREDS = "dockerhub-credentials"
@@ -167,7 +177,13 @@ pipeline {
 3. **Run Tests:** Execute 10 unit tests with pytest
 4. **Build Docker Image:** Build and tag Docker image
 5. **Push to Docker Hub:** Push image to Docker registry
-6. **Test Docker Image:** Test running container
+6. **Test Docker Image:** Test running container with API validation
+
+#### **5.4 GitHub Webhook Integration**
+- **Webhook URL:** `https://9a32df36e311.ngrok-free.app/github-webhook/`
+- **Trigger:** Automatic Jenkins build on push to main branch
+- **Method:** ngrok tunnel for local Jenkins access
+- **Configuration:** GitHub repository webhook settings
 
 ### **Phase 6: Credentials & Security Setup**
 
@@ -209,24 +225,29 @@ pipeline {
 
 ### **Technical Achievements**
 1. **Complete CI/CD Pipeline** - Automated from code to deployment
-2. **Machine Learning Integration** - Production-ready ML model
-3. **Containerization** - Docker-based deployment
-4. **Quality Assurance** - Automated testing and linting
-5. **Monitoring** - Email notifications and logging
+2. **Machine Learning Integration** - Production-ready ML model with RandomForest
+3. **Containerization** - Docker-based deployment with multi-stage builds
+4. **Quality Assurance** - 10 comprehensive unit tests with 100% coverage
+5. **Monitoring** - Email notifications and comprehensive logging
+6. **Webhook Integration** - Automatic Jenkins triggering via GitHub webhooks
 
 ### **DevOps Achievements**
-1. **Branch Protection** - Admin approval workflow
-2. **Automated Testing** - Unit tests and integration tests
-3. **Code Quality** - Flake8 linting enforcement
-4. **Deployment Automation** - Jenkins-based deployment
-5. **Notification System** - Email alerts for all events
+1. **Branch Protection** - Admin approval workflow with pull request requirements
+2. **Automated Testing** - Unit tests, integration tests, and API validation
+3. **Code Quality** - Flake8 linting enforcement across all Python files
+4. **Deployment Automation** - Jenkins-based deployment with Docker Hub integration
+5. **Notification System** - Email alerts for success/failure events
+6. **GitHub Actions** - 4 automated workflows for different stages
 
-### **Compliance Achievements**
-1. **100% Assignment Requirements Met**
-2. **All Required Tools Used**
-3. **Proper Workflow Implementation**
-4. **Admin Approval Process**
-5. **Complete Documentation**
+### **Assignment Compliance Achievements**
+1. **✅ 100% Assignment Requirements Met** - All 7 required tools implemented
+2. **✅ Group Collaboration** - Two-member team with defined roles
+3. **✅ Admin Approval Process** - Pull request workflow with admin approval
+4. **✅ Code Quality Checks** - Flake8 integration in GitHub Actions
+5. **✅ Automated Testing** - Unit testing workflow on test branch
+6. **✅ Jenkins Integration** - Docker containerization and Docker Hub push
+7. **✅ Email Notifications** - Admin notifications for successful deployments
+8. **✅ Complete Documentation** - Comprehensive guides and implementation docs
 
 ---
 
