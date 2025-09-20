@@ -91,14 +91,18 @@ pipeline {
                         # Clean up any existing test containers
                         docker rm -f test-container || true
                         
-                        # Run the container
-                        docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}:latest
+                        # Run the container without port binding for testing
+                        docker run -d --name test-container ${DOCKER_IMAGE}:latest
                         
                         # Wait for container to start
-                        sleep 10
+                        sleep 15
                         
-                        # Test the API
-                        curl -f http://localhost:5000/ || exit 1
+                        # Test the API from inside the container
+                        docker exec test-container curl -f http://localhost:5000/ || exit 1
+                        
+                        # Alternative: Test using container IP
+                        # CONTAINER_IP=\$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' test-container)
+                        # curl -f http://\$CONTAINER_IP:5000/ || exit 1
                         
                         # Clean up
                         docker stop test-container
