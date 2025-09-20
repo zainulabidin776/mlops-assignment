@@ -56,9 +56,18 @@ class APITester:
         })
     
     def start_flask_app(self) -> bool:
-        """Start Flask application in background"""
+        """Check if Flask application is already running or start it"""
         try:
-            print(f"{Colors.CYAN}🚀 Starting Flask application...{Colors.NC}")
+            print(f"{Colors.CYAN}🚀 Checking Flask application...{Colors.NC}")
+            
+            # First, check if Flask app is already running
+            try:
+                response = requests.get(f"{self.base_url}/", timeout=5)
+                if response.status_code == 200:
+                    self.print_test("Flask App Check", "PASS", "Flask app is already running")
+                    return True
+            except requests.exceptions.RequestException:
+                pass  # App not running, continue to start it
             
             # Check if app.py exists
             if not os.path.exists('app/app.py'):
@@ -90,7 +99,7 @@ class APITester:
             return False
     
     def stop_flask_app(self):
-        """Stop Flask application"""
+        """Stop Flask application (only if we started it)"""
         if self.flask_process:
             try:
                 self.flask_process.terminate()
@@ -101,6 +110,9 @@ class APITester:
                 self.print_test("Flask App Stop", "WARN", "Application force killed")
             except Exception as e:
                 self.print_test("Flask App Stop", "FAIL", f"Error stopping app: {str(e)}")
+        else:
+            # We didn't start the app, so don't try to stop it
+            self.print_test("Flask App Stop", "INFO", "App was already running, not stopping")
     
     def test_health_endpoint(self) -> bool:
         """Test health check endpoint"""
@@ -365,9 +377,9 @@ class APITester:
         self.test_model_loading()
         self.test_app_imports()
         
-        # Start Flask app
+        # Check if Flask app is running or start it
         if not self.start_flask_app():
-            self.print_test("API Testing", "FAIL", "Cannot start Flask app, skipping API tests")
+            self.print_test("API Testing", "FAIL", "Cannot connect to Flask app, skipping API tests")
             return self.get_test_summary()
         
         # Wait a bit more for app to be ready
@@ -382,7 +394,7 @@ class APITester:
         self.test_prediction_endpoint_empty_data()
         self.test_response_time()
         
-        # Stop Flask app
+        # Stop Flask app (only if we started it)
         self.stop_flask_app()
         
         return self.get_test_summary()
