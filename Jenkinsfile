@@ -55,10 +55,15 @@ pipeline {
                 script {
                     def tag = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                     def imageName = "${DOCKER_IMAGE}:${tag}"
-                    def latestImage = "${DOCKER_IMAGE}:latest"
                     
                     echo "🐳 Building Docker image: ${imageName}"
-                    dockerImage = docker.build(imageName)
+                    
+                    sh """
+                        docker build -t ${imageName} .
+                        docker tag ${imageName} ${DOCKER_IMAGE}:latest
+                    """
+                    
+                    env.DOCKER_TAG = tag
                     echo "✅ Docker image built successfully"
                 }
             }
@@ -68,9 +73,11 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CREDS}", usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_TOKEN')]) {
-                        sh "echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
-                        dockerImage.push()
-                        dockerImage.push("latest")
+                        sh """
+                            echo ${DOCKERHUB_TOKEN} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin
+                            docker push ${DOCKER_IMAGE}:${env.DOCKER_TAG}
+                            docker push ${DOCKER_IMAGE}:latest
+                        """
                         echo "✅ Docker image pushed to Docker Hub"
                     }
                 }
@@ -80,10 +87,23 @@ pipeline {
         stage('Test Docker Image') {
             steps {
                 script {
-                    sh "docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}:latest"
-                    sleep(10)
-                    sh "curl -f http://localhost:5000/ || exit 1"
-                    sh "docker stop test-container && docker rm test-container"
+                    sh """
+                        # Clean up any existing test containers
+                        docker rm -f test-container || true
+                        
+                        # Run the container
+                        docker run -d -p 5000:5000 --name test-container ${DOCKER_IMAGE}:latest
+                        
+                        # Wait for container to start
+                        sleep 10
+                        
+                        # Test the API
+                        curl -f http://localhost:5000/ || exit 1
+                        
+                        # Clean up
+                        docker stop test-container
+                        docker rm test-container
+                    """
                     echo "✅ Docker image test passed"
                 }
             }
@@ -129,6 +149,11 @@ pipeline {
             echo "❌ Failure notification sent"
         }
         always {
+            // Clean up any leftover containers or images if needed
+            sh '''
+                docker rm -f test-container || true
+                docker system prune -f || true
+            '''
             cleanWs()
             echo "🧹 Workspace cleaned"
         }
