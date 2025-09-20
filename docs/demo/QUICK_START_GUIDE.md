@@ -152,7 +152,7 @@ Add these credentials in Jenkins:
 - [ ] ngrok tunnel active for webhook
 - [ ] GitHub webhook configured
 - [ ] Test data prepared
-- [ ] All services verified
+- [ ] All services verifiedd
 
 ### **Run Demo Test**
 ```bash
