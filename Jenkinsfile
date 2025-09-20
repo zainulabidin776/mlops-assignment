@@ -1,6 +1,10 @@
 pipeline {
     agent any
     
+     triggers {
+        githubPush()
+    }
+    
     environment {
         DOCKER_IMAGE = "itsmezayynn/heart-disease-api"
         DOCKERHUB_CREDS = "dockerhub-credentials"
