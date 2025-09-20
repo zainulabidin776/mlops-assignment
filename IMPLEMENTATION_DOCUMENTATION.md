@@ -7,7 +7,7 @@
 **Project:** Heart Disease Prediction API with Complete CI/CD Pipeline
 
 **Assignment:** Machine Learning Operations Assignment 1 (100 Marks)
-**Deadline:** September 20, 2025
+**Deadline:** September 20, 20255
 
 ---
 
