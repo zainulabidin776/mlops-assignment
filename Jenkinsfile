@@ -84,45 +84,45 @@ pipeline {
             }
         }
         
-       stage('Test Docker Image') {
-    steps {
-        script {
-            sh """
-                # Clean up any existing test containers
-                docker rm -f test-container || true
-                
-                # Run the container with proper port mapping
-                docker run -d -p 5001:5000 --name test-container ${DOCKER_IMAGE}:latest
-                
-                # Wait longer for container to start
-                echo "⏳ Waiting for container to start..."
-                sleep 15
-                
-                # Check if container is running
-                docker ps
-                docker logs test-container
-                
-                # Test the API with retry logic
-                echo "�� Testing API endpoint..."
-                for i in {1..5}; do
-                    echo "Attempt $i..."
-                    if curl -f http://localhost:5001/; then
-                        echo "✅ API test successful!"
-                        break
-                    else
-                        echo "❌ API test failed, waiting 5 seconds..."
-                        sleep 5
-                    fi
-                done
-                
-                # Clean up
-                docker stop test-container
-                docker rm test-container
-            """
-            echo "✅ Docker image test passed"
+        stage('Test Docker Image') {
+            steps {
+                script {
+                    sh """
+                        # Clean up any existing test containers
+                        docker rm -f test-container || true
+                        
+                        # Run the container with proper port mapping
+                        docker run -d -p 5001:5000 --name test-container ${DOCKER_IMAGE}:latest
+                        
+                        # Wait longer for container to start
+                        echo "⏳ Waiting for container to start..."
+                        sleep 15
+                        
+                        # Check if container is running
+                        docker ps
+                        docker logs test-container
+                        
+                        # Test the API with retry logic
+                        echo "🔍 Testing API endpoint..."
+                        for i in {1..5}; do
+                            echo "Attempt $i..."
+                            if curl -f http://localhost:5001/; then
+                                echo "✅ API test successful!"
+                                break
+                            else
+                                echo "❌ API test failed, waiting 5 seconds..."
+                                sleep 5
+                            fi
+                        done
+                        
+                        # Clean up
+                        docker stop test-container
+                        docker rm test-container
+                    """
+                    echo "✅ Docker image test passed"
+                }
+            }
         }
-    }
-}
     }
     
     post {
