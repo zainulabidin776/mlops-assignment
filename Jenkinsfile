@@ -19,16 +19,20 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
-                    # Check if python3 is available, if not install it
-                    if ! command -v python3 &> /dev/null; then
-                        echo "Installing Python3..."
-                        sudo apt-get update
-                        sudo apt-get install -y python3 python3-pip
+                    # Check if python3 is available
+                    if command -v python3 &> /dev/null; then
+                        echo "Python3 found, using it..."
+                        python3 -m pip install --upgrade pip
+                        python3 -m pip install -r app/requirements.txt
+                    elif command -v python &> /dev/null; then
+                        echo "Python found, using it..."
+                        python -m pip install --upgrade pip
+                        python -m pip install -r app/requirements.txt
+                    else
+                        echo "Neither python3 nor python found. Please install Python on Jenkins server."
+                        echo "Run: apt-get update && apt-get install -y python3 python3-pip"
+                        exit 1
                     fi
-                    
-                    # Use python3 for all operations
-                    python3 -m pip install --upgrade pip
-                    python3 -m pip install -r app/requirements.txt
                 '''
                 echo "✅ Dependencies installed"
             }
@@ -37,8 +41,17 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                    python3 -m pip install pytest
-                    python3 -m pytest tests/ -v
+                    # Use the same Python command as dependencies stage
+                    if command -v python3 &> /dev/null; then
+                        python3 -m pip install pytest
+                        python3 -m pytest tests/ -v
+                    elif command -v python &> /dev/null; then
+                        python -m pip install pytest
+                        python -m pytest tests/ -v
+                    else
+                        echo "Python not found for testing"
+                        exit 1
+                    fi
                 '''
                 echo "✅ Tests passed"
             }
