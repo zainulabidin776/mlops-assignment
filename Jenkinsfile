@@ -91,18 +91,17 @@ pipeline {
                         # Clean up any existing test containers
                         docker rm -f test-container || true
                         
-                        # Run the container without port binding for testing
-                        docker run -d --name test-container ${DOCKER_IMAGE}:latest
+                        # Run the container with port mapping for testing
+                        docker run -d -p 5001:5000 --name test-container ${DOCKER_IMAGE}:latest
                         
                         # Wait for container to start
                         sleep 15
                         
-                        # Test the API from inside the container
-                        docker exec test-container curl -f http://localhost:5000/ || exit 1
+                        # Test the API using wget (alternative to curl)
+                        docker exec test-container wget -q --spider http://localhost:5000/ || exit 1
                         
-                        # Alternative: Test using container IP
-                        # CONTAINER_IP=\$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' test-container)
-                        # curl -f http://\$CONTAINER_IP:5000/ || exit 1
+                        # Alternative: Test using Jenkins host with port mapping
+                        curl -f http://localhost:5001/ || wget -q --spider http://localhost:5001/ || exit 1
                         
                         # Clean up
                         docker stop test-container
