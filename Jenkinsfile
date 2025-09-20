@@ -91,24 +91,28 @@ pipeline {
                         # Clean up any existing test containers
                         docker rm -f test-container || true
                         
-                        # Run the container with host port mapping
-                        docker run -d -p 5001:5000 --name test-container ${DOCKER_IMAGE}:latest
+                        # Run container with random free port
+                        docker run -d -p 0:5000 --name test-container ${DOCKER_IMAGE}:latest
                         
-                        echo "⏳ Waiting for API to become ready..."
+                        # Find dynamically assigned port
+                        HOST_PORT=\$(docker port test-container 5000/tcp | cut -d: -f2)
+                        echo "🚀 API is running on port \$HOST_PORT"
+                        
+                        # Wait until API is ready
                         for i in {1..20}; do
-                            if curl -s http://localhost:5001/ > /dev/null; then
-                                echo "✅ API is up"
+                            if curl -s http://localhost:\$HOST_PORT/ > /dev/null; then
+                                echo "✅ API is up on port \$HOST_PORT"
                                 break
                             fi
-                            echo "⏳ Still waiting... attempt \$i"
+                            echo "⏳ Waiting for API to start... attempt \$i"
                             sleep 3
                         done
                         
                         echo "🔍 Running health check..."
-                        curl -f http://localhost:5001/ || exit 1
+                        curl -f http://localhost:\$HOST_PORT/ || exit 1
                         
                         echo "🔍 Running prediction test..."
-                        curl -s -X POST http://localhost:5001/predict \
+                        curl -s -X POST http://localhost:\$HOST_PORT/predict \
                             -H "Content-Type: application/json" \
                             -d '{
                                 "age": 50,
@@ -175,6 +179,7 @@ pipeline {
             echo "❌ Failure notification sent"
         }
         always {
+            // Clean up any leftover containers or images if needed
             sh '''
                 docker rm -f test-container || true
                 docker system prune -f || true
