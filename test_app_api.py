@@ -1,4 +1,4 @@
-py#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 🧪 Flask API Test Script for MLOps Assignment
 Group Members: Zain Ul Abidin (22I-2738) & Ahmed Javed (21I-1108)
