@@ -91,17 +91,24 @@ pipeline {
                         # Clean up any existing test containers
                         docker rm -f test-container || true
                         
-                        # Run the container WITHOUT host port mapping (no -p)
-                        docker run -d --name test-container ${DOCKER_IMAGE}:latest
+                        # Run the container with host port mapping
+                        docker run -d -p 5001:5000 --name test-container ${DOCKER_IMAGE}:latest
                         
-                        # Wait for container to start
-                        sleep 15
+                        echo "⏳ Waiting for API to become ready..."
+                        for i in {1..20}; do
+                            if curl -s http://localhost:5001/ > /dev/null; then
+                                echo "✅ API is up"
+                                break
+                            fi
+                            echo "⏳ Still waiting... attempt \$i"
+                            sleep 3
+                        done
                         
-                        echo "🔍 Running API health check..."
-                        docker exec test-container curl -f http://localhost:5000/ || exit 1
+                        echo "🔍 Running health check..."
+                        curl -f http://localhost:5001/ || exit 1
                         
                         echo "🔍 Running prediction test..."
-                        docker exec test-container curl -s -X POST http://localhost:5000/predict \
+                        curl -s -X POST http://localhost:5001/predict \
                             -H "Content-Type: application/json" \
                             -d '{
                                 "age": 50,
