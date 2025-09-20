@@ -56,9 +56,18 @@ class APITester:
         })
     
     def start_flask_app(self) -> bool:
-        """Start Flask application in background for Windows"""
+        """Check if Flask application is already running or start it for Windows"""
         try:
-            print(f"{Colors.CYAN}🚀 Starting Flask application...{Colors.NC}")
+            print(f"{Colors.CYAN}🚀 Checking Flask application...{Colors.NC}")
+            
+            # First, check if Flask app is already running
+            try:
+                response = requests.get(f"{self.base_url}/", timeout=5)
+                if response.status_code == 200:
+                    self.print_test("Flask App Check", "PASS", "Flask app is already running")
+                    return True
+            except requests.exceptions.RequestException:
+                pass  # App not running, continue to start it
             
             # Check if app.py exists
             if not os.path.exists('app/app.py'):
@@ -92,7 +101,7 @@ class APITester:
             return False
     
     def stop_flask_app(self):
-        """Stop Flask application on Windows"""
+        """Stop Flask application on Windows (only if we started it)"""
         if self.flask_process:
             try:
                 print(f"{Colors.CYAN}🛑 Stopping Flask application...{Colors.NC}")
@@ -104,6 +113,9 @@ class APITester:
                 self.print_test("Flask App Stop", "WARN", "Application force killed")
             except Exception as e:
                 self.print_test("Flask App Stop", "FAIL", f"Error stopping app: {str(e)}")
+        else:
+            # We didn't start the app, so don't try to stop it
+            self.print_test("Flask App Stop", "INFO", "App was already running, not stopping")
     
     def test_health_endpoint(self) -> bool:
         """Test health check endpoint"""
@@ -130,19 +142,19 @@ class APITester:
         """Test prediction endpoint with valid data"""
         try:
             print(f"{Colors.CYAN}🔮 Testing prediction endpoint with valid data...{Colors.NC}")
-            # Valid test data (using correct feature names from metadata.json)
+            # Valid test data (using correct data types from dataset)
             test_data = {
                 "Age": 65,
-                "Sex": 1,
-                "ChestPainType": 3,
+                "Sex": "M",
+                "ChestPainType": "ATA",
                 "RestingBP": 145,
                 "Cholesterol": 233,
-                "FastingBS": 1,
-                "RestingECG": 0,
+                "FastingBS": 0,
+                "RestingECG": "Normal",
                 "MaxHR": 150,
-                "ExerciseAngina": 0,
+                "ExerciseAngina": "N",
                 "Oldpeak": 2.3,
-                "ST_Slope": 0
+                "ST_Slope": "Up"
             }
             
             response = requests.post(
@@ -180,10 +192,10 @@ class APITester:
         """Test prediction endpoint with missing features"""
         try:
             print(f"{Colors.CYAN}❌ Testing prediction endpoint with missing features...{Colors.NC}")
-            # Incomplete test data (using correct feature names)
+            # Incomplete test data (using correct data types)
             test_data = {
                 "Age": 65,
-                "Sex": 1
+                "Sex": "M"
                 # Missing other required features
             }
             

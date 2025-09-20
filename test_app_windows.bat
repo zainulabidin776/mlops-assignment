@@ -202,9 +202,9 @@ echo 🔮 Testing Prediction Endpoint (Valid Data)
 echo ========================================
 echo.
 
-curl -s -X POST %API_URL%/predict -H "Content-Type: application/json" -d "{\"Age\": 65, \"Sex\": 1, \"ChestPainType\": 3, \"RestingBP\": 145, \"Cholesterol\": 233, \"FastingBS\": 1, \"RestingECG\": 0, \"MaxHR\": 150, \"ExerciseAngina\": 0, \"Oldpeak\": 2.3, \"ST_Slope\": 0}" >nul 2>&1
+curl -s -X POST %API_URL%/predict -H "Content-Type: application/json" -d "{\"Age\": 65, \"Sex\": \"M\", \"ChestPainType\": \"ATA\", \"RestingBP\": 145, \"Cholesterol\": 233, \"FastingBS\": 0, \"RestingECG\": \"Normal\", \"MaxHR\": 150, \"ExerciseAngina\": \"N\", \"Oldpeak\": 2.3, \"ST_Slope\": \"Up\"}" >nul 2>&1
 if %errorlevel% equ 0 (
-    for /f "tokens=*" %%i in ('curl -s -X POST %API_URL%/predict -H "Content-Type: application/json" -d "{\"Age\": 65, \"Sex\": 1, \"ChestPainType\": 3, \"RestingBP\": 145, \"Cholesterol\": 233, \"FastingBS\": 1, \"RestingECG\": 0, \"MaxHR\": 150, \"ExerciseAngina\": 0, \"Oldpeak\": 2.3, \"ST_Slope\": 0}" 2^>^&1') do set PREDICTION_RESPONSE=%%i
+    for /f "tokens=*" %%i in ('curl -s -X POST %API_URL%/predict -H "Content-Type: application/json" -d "{\"Age\": 65, \"Sex\": \"M\", \"ChestPainType\": \"ATA\", \"RestingBP\": 145, \"Cholesterol\": 233, \"FastingBS\": 0, \"RestingECG\": \"Normal\", \"MaxHR\": 150, \"ExerciseAngina\": \"N\", \"Oldpeak\": 2.3, \"ST_Slope\": \"Up\"}" 2^>^&1') do set PREDICTION_RESPONSE=%%i
     echo %PREDICTION_RESPONSE% | findstr "prediction" >nul
     if %errorlevel% equ 0 (
         echo ✅ PASS: Prediction (Valid) - Response: %PREDICTION_RESPONSE%
@@ -227,9 +227,9 @@ echo ❌ Testing Prediction Endpoint (Missing Features)
 echo ========================================
 echo.
 
-curl -s -X POST %API_URL%/predict -H "Content-Type: application/json" -d "{\"Age\": 65, \"Sex\": 1}" >nul 2>&1
+curl -s -X POST %API_URL%/predict -H "Content-Type: application/json" -d "{\"Age\": 65, \"Sex\": \"M\"}" >nul 2>&1
 if %errorlevel% equ 0 (
-    for /f "tokens=*" %%i in ('curl -s -X POST %API_URL%/predict -H "Content-Type: application/json" -d "{\"Age\": 65, \"Sex\": 1}" 2^>^&1') do set ERROR_RESPONSE=%%i
+    for /f "tokens=*" %%i in ('curl -s -X POST %API_URL%/predict -H "Content-Type: application/json" -d "{\"Age\": 65, \"Sex\": \"M\"}" 2^>^&1') do set ERROR_RESPONSE=%%i
     echo %ERROR_RESPONSE% | findstr "error" >nul
     if %errorlevel% equ 0 (
         echo ✅ PASS: Prediction (Missing Features) - Error handling: %ERROR_RESPONSE%
