@@ -84,50 +84,50 @@ pipeline {
             }
         }
         
-        stage('Test Docker Image') {
-            steps {
-                script {
-                    sh """
-                        # Clean up any existing test containers
-                        docker rm -f test-container || true
-                        
-                        # Run the container with port mapping for testing
-                        docker run -d -p 5001:5000 --name test-container ${DOCKER_IMAGE}:latest
-                        
-                        # Wait for container to start
-                        sleep 15
-                        
-                        echo "🔍 Running API health check..."
-                        docker exec test-container curl -f http://localhost:5000/ || exit 1
-                        
-                        echo "🔍 Running prediction test..."
-                        docker exec test-container curl -s -X POST http://localhost:5000/predict \
-                            -H "Content-Type: application/json" \
-                            -d '{
-                                "age": 50,
-                                "sex": 1,
-                                "cp": 2,
-                                "trestbps": 130,
-                                "chol": 250,
-                                "fbs": 0,
-                                "restecg": 1,
-                                "thalach": 160,
-                                "exang": 0,
-                                "oldpeak": 1.0,
-                                "slope": 2,
-                                "ca": 0,
-                                "thal": 2
-                            }' || exit 1
-                        
-                        # Clean up
-                        docker stop test-container
-                        docker rm test-container
-                    """
-                    echo "✅ Docker image test passed"
-                }
-            }
+ stage('Test Docker Image') {
+    steps {
+        script {
+            sh """
+                # Clean up any existing test containers
+                docker rm -f test-container || true
+                
+                # Run the container WITHOUT exposing host ports (no -p needed for CI)
+                docker run -d --name test-container ${DOCKER_IMAGE}:latest
+                
+                # Wait for container to start
+                sleep 15
+                
+                echo "🔍 Running API health check..."
+                docker exec test-container curl -f http://localhost:5000/ || exit 1
+                
+                echo "🔍 Running prediction test..."
+                docker exec test-container curl -s -X POST http://localhost:5000/predict \
+                    -H "Content-Type: application/json" \
+                    -d '{
+                        "age": 50,
+                        "sex": 1,
+                        "cp": 2,
+                        "trestbps": 130,
+                        "chol": 250,
+                        "fbs": 0,
+                        "restecg": 1,
+                        "thalach": 160,
+                        "exang": 0,
+                        "oldpeak": 1.0,
+                        "slope": 2,
+                        "ca": 0,
+                        "thal": 2
+                    }' || exit 1
+                
+                # Clean up
+                docker stop test-container
+                docker rm test-container
+            """
+            echo "✅ Docker image test passed"
         }
     }
+}
+
     
     post {
         success {
