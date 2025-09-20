@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.10-slim'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
     
     environment {
         DOCKER_IMAGE = "itsmezayynn/heart-disease-api"
@@ -24,8 +19,16 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
-                    python -m pip install --upgrade pip
-                    pip install -r app/requirements.txt
+                    # Check if python3 is available, if not install it
+                    if ! command -v python3 &> /dev/null; then
+                        echo "Installing Python3..."
+                        sudo apt-get update
+                        sudo apt-get install -y python3 python3-pip
+                    fi
+                    
+                    # Use python3 for all operations
+                    python3 -m pip install --upgrade pip
+                    python3 -m pip install -r app/requirements.txt
                 '''
                 echo "✅ Dependencies installed"
             }
@@ -34,8 +37,8 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                    pip install pytest
-                    pytest tests/ -v
+                    python3 -m pip install pytest
+                    python3 -m pytest tests/ -v
                 '''
                 echo "✅ Tests passed"
             }
@@ -49,8 +52,6 @@ pipeline {
                     def latestImage = "${DOCKER_IMAGE}:latest"
                     
                     echo "Building Docker image: ${imageName}"
-                    // Install Docker CLI in the container
-                    sh 'apt-get update && apt-get install -y docker.io'
                     dockerImage = docker.build(imageName)
                     echo "✅ Docker image built successfully"
                 }
