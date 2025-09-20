@@ -4,7 +4,7 @@ pipeline {
      triggers {
         githubPush()
     }
-    
+
     environment {
         DOCKER_IMAGE = "itsmezayynn/heart-disease-api"
         DOCKERHUB_CREDS = "dockerhub-credentials"
@@ -110,7 +110,7 @@ pipeline {
                         echo "🔍 Testing API endpoint..."
                         for i in \$(seq 1 5); do
                             echo "Attempt \$i..."
-                            if curl -f http://localhost:5001/; then
+                            if curl -f http://localhost:5000/; then
                                 echo "✅ API test successful!"
                                 break
                             else

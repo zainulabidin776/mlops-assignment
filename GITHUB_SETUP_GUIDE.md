@@ -11,7 +11,7 @@ Add these secrets:
 - `DOCKERHUB_TOKEN`: Your Docker Hub access token (not password)
 - `SLACK_WEBHOOK`: (Optional) Slack webhook URL for notifications
 
-### 2. **Set Up Branch Protection Rules**
+### 2. **Set Up Branch Protection Ruless**
 
 #### For `main` branch:
 1. Go to Settings → Branches → Add rule
