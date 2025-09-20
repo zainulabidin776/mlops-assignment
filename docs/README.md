@@ -2,7 +2,7 @@
 
 **Group Members:**
 - **Zain Ul Abidin** (22I-2738) - Primary Developer & DevOps Engineer
-- **Ahmed Javed** (21I-1108) - Co-Developer & Testing Specialist
+- **Ahmed Javeed** (21I-1108) - Co-Developer & Testing Specialist
 
 **Project:** Heart Disease Prediction API with Complete CI/CD Pipeline
 
