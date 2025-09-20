@@ -97,25 +97,27 @@ pipeline {
                         # Wait for container to start
                         sleep 15
                         
-                        # Test using Python (requests is already installed in the container)
-                        docker exec test-container python -c "
-import requests
-import sys
-try:
-    response = requests.get('http://localhost:5000/', timeout=10)
-    if response.status_code == 200:
-        print('✅ API Health check passed')
-        sys.exit(0)
-    else:
-        print('❌ API returned status code:', response.status_code)
-        sys.exit(1)
-except Exception as e:
-    print('❌ Health check failed:', str(e))
-    sys.exit(1)
-"
+                        echo "🔍 Running API health check..."
+                        docker exec test-container curl -f http://localhost:5000/ || exit 1
                         
-                        # Alternative: Test from Jenkins host using curl (Jenkins has curl)
-                        curl -f http://localhost:5001/ || exit 1
+                        echo "🔍 Running prediction test..."
+                        docker exec test-container curl -s -X POST http://localhost:5000/predict \
+                            -H "Content-Type: application/json" \
+                            -d '{
+                                "age": 50,
+                                "sex": 1,
+                                "cp": 2,
+                                "trestbps": 130,
+                                "chol": 250,
+                                "fbs": 0,
+                                "restecg": 1,
+                                "thalach": 160,
+                                "exang": 0,
+                                "oldpeak": 1.0,
+                                "slope": 2,
+                                "ca": 0,
+                                "thal": 2
+                            }' || exit 1
                         
                         # Clean up
                         docker stop test-container
