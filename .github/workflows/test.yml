@@ -29,5 +29,5 @@ jobs:
         run: |
           python app/app.py &
           sleep 5
-          python test_request.py
+          python tests/test_request.py
           pkill -f "python app/app.py"
