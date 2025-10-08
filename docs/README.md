@@ -22,6 +22,9 @@
 - **[`QUICK_START_GUIDE.md`](demo/QUICK_START_GUIDE.md)** - Quick setup and testing instructions
 - **[`QUICK_DEMO_COMMANDS.md`](demo/QUICK_DEMO_COMMANDS.md)** - Essential commands for immediate demo
 
+### **☸️ Kubernetes & Minikube**
+- **[`DEPLOY_MINIKUBE.md`](DEPLOY_MINIKUBE.md)** - Deploy this project to Minikube end-to-end
+
 ### **🧪 Testing Documentation** (`testing/`)
 - **[`TESTING_GUIDE.md`](testing/TESTING_GUIDE.md)** - Comprehensive testing procedures
 - **[`API_TESTING_GUIDE.md`](testing/API_TESTING_GUIDE.md)** - Flask API testing guide
